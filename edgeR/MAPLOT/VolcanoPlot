@@ -1,0 +1,134 @@
+rm(list=ls())
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+library("edgeR")
+
+BiocManager::install("statmod")
+library("statmod")
+
+x <- read.delim("CRCHETERO_READCOUNT_DIST.txt",check.names=FALSE, stringsAsFactors=FALSE)
+y <- DGEList(counts=x)
+
+# filter out lowly expressed genes
+keep <- filterByExpr(y)
+y <- y[keep, , keep.lib.sizes=FALSE]
+
+# perform the TMM normalization and display the normalization factors
+y <- calcNormFactors(y)
+y$samples
+
+#  estimate common dispersion and tagwise dispersions in one run
+y <- estimateDisp(y)
+y <- estimateDisp(y, design)
+
+et <- exactTest(y)
+topTags(et)
+----------------------------------------------------------------------------------------------------------------
+rawdata <- read.delim("CRCHETERO_READCOUNT_MAPLOT.txt",check.names=FALSE, stringsAsFactors=FALSE)
+y <- DGEList(counts=rawdata[,4:149], genes=rawdata[,1:3])
+keep <- filterByExpr(y)
+y <- y[keep, , keep.lib.sizes=FALSE]
+y$samples$lib.size <- colSums(y$counts)
+rownames(y$counts) <- rownames(y$genes) <- y$genes$Gene_ID
+y$genes$EntrezGene <- NULL
+y <- calcNormFactors(y)
+y$samples
+plotMDS(y)
+
+patient<-read.table("MAPLOTpatient.txt", header=T, sep="\t", na.strings = "NA")
+Patient<-as.factor(t(patient))
+tissue<-read.table("MAPLOTtissue.txt", header=T, sep="\t", na.strings = "NA")
+Tissue<-as.factor(t(tissue))
+data.frame(Sample=colnames(y),Patient,Tissue)
+design <- model.matrix(~Patient+Tissue)
+rownames(design) <- colnames(y)
+design
+y <- estimateDisp(y, design, robust=TRUE)
+y$common.dispersion
+plotBCV(y)
+fit <- glmFit(y, design)
+lrt <- glmLRT(fit)
+topTags(lrt)
+colnames(design)
+o <- order(lrt$table$PValue)
+cpm(y)[o[1:10],]
+summary(decideTests(lrt))
+plotMD(lrt)
+abline(h=c(-1, 1), col="blue")
+
+aa<-topTags(lrt,n=12812)
+
+write.table(aa, "CRC_HETERO_MAPLOTVOLPLOTFDR.txt", sep="\t")
+aaa<-lrt$table
+----------------------------------------------------------------------------------------------------------------
+library(ggplot2)
+
+## Plot MA plots
+res <- read.table("CRC_HETERO_MAPLOTVOLPLOTFDR.txt", 
+                  sep="\t", header=T, quote = "\"", fill = T)
+res <- res[with(res, order(logFC)),]
+res$threshold <- as.factor(res$FDR < 0.05)
+tiff("HIGH_vs_Control_MAplot.tiff", width = 600, height = 600)
+ggplot(data=res, aes(x=AveExpr, y=logFC, colour=threshold)) + 
+  geom_point(alpha=0.4, size=1.8) + 
+  geom_hline(aes(yintercept = 0), colour = "blue", size = 1.2) +
+  ylim(c(min(res$logFC), max(res$logFC))) + 
+  xlab("Mean expression") + 
+  ylab("Log2 Fold Change") + 
+  theme(axis.title.x = element_text(face = "bold", size = 15),
+        axis.text.x = element_text(face = "bold", size = 12)) +
+  theme(axis.title.y = element_text(face = "bold", size = 15),
+        axis.text.y = element_text(face = "bold", size = 12)) +
+  scale_colour_discrete(name = "p.adjusted < 0.05") +
+  theme(legend.title = element_text(face = "bold", size = 15)) +
+  theme(legend.text = element_text(size = 14))
+dev.off()
+----------------------------------------------------------------------------------------------------------------
+setwd("C://Users/BECAUSEWECAN/Desktop")
+
+library("DESeq2")
+library(ggplot2)
+library(ggpubr)
+library(EnhancedVolcano)
+
+data1 <- read.table("maplotbackup.txt",sep="\t", header=T)
+data2 <- read.table("resDESeq2formaplot.txt",sep="\t", header=T)
+data3 <- read.table("resDESeq2.txt",sep="\t", header=T)
+res<-data3
+res = as.matrix(res)
+row.names(res)<-data1$GeneSymbol
+head(res)
+
+ggmaplot(data2, main = expression("Normal vs Cancer"),
+   fdr = 0.05, fc = 2, size = 0.4,
+   palette = c("#B31B21", "#1465AC", "darkgray"),
+   genenames = as.vector(data2$name),
+   legend = "top", top = 100,
+   font.label = c("bold", 11),
+   font.legend = "bold",
+   font.main = "bold",
+   ggtheme = ggplot2::theme_minimal())
+
+dev.copy(tiff,"CRC_HETERO_MAPLOT_TOP20.tiff",width=10, height=5, units="in",res=200) 
+dev.off() 
+
+  EnhancedVolcano(res,
+    lab = rownames(res),
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-5, 8))
+
+  EnhancedVolcano(res,
+    lab = rownames(res),
+    x = 'log2FoldChange',
+    y = 'pvalue',
+    xlim = c(-8, 8),
+    title = 'Normal versus Cancer',
+    pCutoff = 10e-16,
+    FCcutoff = 1.5,
+)
+dev.copy(tiff,"CRC_HETERO_VOLVANOPLOT.tiff",width=6, height=10, units="in",res=200) 
+dev.off()
