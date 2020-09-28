@@ -1,0 +1,73 @@
+rm(list=ls())
+setwd('C://Users/BECAUSEWECAN/Desktop')
+
+data1<-read.table("CRC_HETERO_DIST_TPM_SORTED_WOTumor.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+data2<-data1[,2:82]
+data2 = as.matrix(data2)
+row.names(data2)<-data1$Gene_ID
+head(data2)
+cormat <- round(cor(data2),2)
+head(cormat)
+
+library(reshape2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+
+library(ggplot2)
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()
+# Get lower triangle of the correlation matrix
+  get_lower_tri<-function(cormat){
+    cormat[upper.tri(cormat)] <- NA
+    return(cormat)
+  }
+# Get upper triangle of the correlation matrix
+  get_upper_tri <- function(cormat){
+    cormat[lower.tri(cormat)]<- NA
+    return(cormat)
+  }
+upper_tri <- get_upper_tri(cormat)
+
+library(reshape2)
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+-------------------------------------------------------------------------------
+library(ggplot2)
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0.5, limit = c(0,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+dev.copy(tiff,"CRC_HTERO_DIST_CTOUT2.tiff",width=20, height=20, units="in",res=200) 
+dev.off() 
+
+-------------------------------------------------------------------------------
+cormat2<-signif(cor(data2),2)
+head(cormat2)
+col<- colorRampPalette(c("blue", "white", "red"))(20)
+heatmap(cormat2, col=col, symm=TRUE)
+dev.copy(tiff,"CRC_HTERO_DIST_CTOUT.tiff",width=20, height=20, units="in",res=200) 
+dev.off() 
+
+-------------------------------------------------------------------------------
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("Biobase", "limma"))
+install.packages("gplots")
+
+library("gplots")
+library("RColorBrewer")
+colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+heatmap.2(cormat2, trace="none", col=colours)
+
+-------------------------------------------------------------------------------
+
+
+colnames(sampleDistMatrix) <- NULL   
+library( "gplots" )
+library( "RColorBrewer" )
+colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+heatmap.2( sampleDistMatrix, trace="none", col=colours)
+
