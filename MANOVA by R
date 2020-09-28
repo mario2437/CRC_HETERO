@@ -1,0 +1,31 @@
+setwd("C://Users/BECAUSEWECAN/Desktop")
+data1<-read.table("MANOVAreal.txt", header=T, sep="\t", na.strings = "NA")
+outcome <- cbind(data1$Cetuximab, data1$CMSTYPE)
+ocdModel <- manova(outcome ~ Group, data=data1)
+summary(ocdModel, intercept=TRUE)
+
+
+# MANOVA test
+
+res.man <- manova(cbind(data1$Cetuximab, data1$Olaparib, data1$TAS.102) ~ DRUG, data = data1)
+summary(res.man)
+summary.aov(res.man)
+
+##### Antimetabolite to CMSTYPE
+res.man <- manova(cbind(data1$X5.FU, data1$Capecitabine, data1$TAS.102, data1$Oxaliplatin) ~ CMSTYPE, data = data1)
+summary(res.man)
+summary.aov(res.man)
+
+##### 
+res.man <- manova(cbind(data1$Cetuximab, data1$Afatinib) ~ KRAS, data = data1)
+summary(res.man)
+summary.aov(res.man)
+
+##### TOTAL
+res.man <- manova(cbind(data1$TAS.102, data1$Regorafenib, data1$Leucovorin.calcium, data1$Capecitabine, 
+data1$Apitolisib, data1$Belinostat, data1$Trametinib, data1$Cyclopamine, data1$ICG.001, data1$Buparlisib, data1$SAHA,
+data1$Afatinib, data1$AZD2014, data1$MK.5108, data1$Olaparib, data1$Irinotecan, data1$X5.FU, data1$Oxaliplatin,
+data1$Baicalein, data1$Curcumin, data1$Genistein, data1$Resveratrol, data1$Cetuximab, data1$Bevacizumab) ~ CMSTYPE, data = data1)
+
+summary(res.man)
+summary.aov(res.man)
