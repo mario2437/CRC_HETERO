@@ -1,0 +1,340 @@
+rm(list=ls())
+setwd("C://Users/BECAUSEWECAN/Desktop/")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+
+BiocManager::install("GGally")
+library("scatterplot3d")
+
+------------------------CMSTYPE---------------------------------
+
+data1<-read.table("MANOVAexample.txt", header=T, sep="\t", na.strings = "NA")
+library(GGally)
+library(ggplot2)
+data2<-data1[,c(1:24, 27)]
+head(data2)
+
+p <- ggpairs(data2, aes(color = KRAS))+ theme_bw()
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("#00AFBB", "#E7B800", "#FC4E07")) +
+        scale_color_manual(values=c("#00AFBB", "#E7B800", "#FC4E07"))  
+  }
+}
+p
+
+dev.copy(tiff,"MANOVA_KRAS.tiff",width=30, height=30, units="in",res=200) 
+
+dev.off() 
+
+
+
+------------------------CMSTYPE---------------------------------
+
+
+data1<-read.table("MANOVAexample.txt", header=T, sep="\t", na.strings = "NA")
+library(GGally)
+library(ggplot2)
+
+
+my_data = subset(my_data, gender == "male")
+
+p<-ggpairs(
+  data1[,c(23, 27)],
+  mapping = ggplot2::aes(color = KRAS),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS-Cetuximab"
+)
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("purple4", "lightsteelblue4")) +
+        scale_color_manual(values=c("purple4", "lightsteelblue4"))  
+  }
+}
+
+p
+
+dev.copy(tiff,"KRAS_Cetuximab.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+
+------------------------CMSTYPE---------------------------------
+
+p<-ggpairs(
+  data1[,c(23, 40)],
+  mapping = ggplot2::aes(color = CMSTYPE),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "CMS-Cetuximab"
+)
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey")) +
+        scale_color_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey"))  
+  }
+}
+p
+
+
+dev.copy(tiff,"CMS_Cetuximab.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+------------------------CMSTYPE---------------------------------
+
+p<-ggpairs(
+  data1[,c(23, 42)],
+  mapping = ggplot2::aes(color = CMS_KRAS),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS-CMS-Cetuximab"
+)
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("springgreen4", "springgreen4", "deeppink3", "deeppink3", "deepskyblue4", "deepskyblue4", "orange", "orange", "grey")) +
+        scale_color_manual(values=c("springgreen4", "springgreen4", "deeppink3", "deeppink3", "deepskyblue4", "deepskyblue4", "orange", "orange", "grey"))  
+  }
+}
+p
+
+
+dev.copy(tiff,"KRAS_CMS_Cetuximab.tiff",width=14, height=8, units="in",res=200) 
+dev.off() 
+
+
+------------------------CMSTYPE---------------------------------
+
+p<-ggpairs(
+  data1[,c(23, 43)],
+  mapping = ggplot2::aes(color = CMS_KRAS_CultureType),
+  upper = list(continuous = wrap("density", alpha = 0.2), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS-CMS-Cetuximab-CultureType"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("springgreen4", "springgreen4", "deeppink3", "deepskyblue4", "orange", "orange", "grey", "springgreen4", "deeppink3", "deeppink3", "deepskyblue4", "deepskyblue4", "orange", "orange", "grey")) +
+        scale_color_manual(values=c("springgreen4", "springgreen4", "deeppink3", "deepskyblue4", "orange", "orange", "grey", "springgreen4", "deeppink3", "deeppink3", "deepskyblue4", "deepskyblue4", "orange", "orange", "grey"))  
+  }
+}
+p
+
+dev.copy(tiff,"KRAS_CMS_Cetuximab_CultureType.tiff",width=30, height=12, units="in",res=200) 
+dev.off() 
+
+
+
+
+
+------------------------CMSTYPE_TAS102_CMS---------------------------------
+
+p<-ggpairs(
+  data1[,c(1, 40)],
+  mapping = ggplot2::aes(color = CMSTYPE),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "CMS-TAS102"
+)
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey")) +
+        scale_color_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey"))  
+  }
+}
+
+p
+
+dev.copy(tiff,"CMS_TAS102.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+
+
+------------------------CMSTYPE_Oxaliplatin_CMS---------------------------------
+
+p<-ggpairs(
+  data1[,c(18, 40)],
+  mapping = ggplot2::aes(color = CMSTYPE),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "CMS-Oxaliplatin"
+)
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey")) +
+        scale_color_manual(values=c("springgreen4", "deeppink3", "deepskyblue4", "orange", "grey"))  
+  }
+}
+
+p
+
+dev.copy(tiff,"CMS_Oxaliplatin.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+------------------------CELLTYPE_Cetuximab_CMS---------------------------------
+
+p<-ggpairs(
+  data1[,c(23, 44)],
+  mapping = ggplot2::aes(color = SAMPLESET),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS-CMS-Cetuximab-CultureType"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("hotpink1", "lightsalmon2", "darkmagenta", "gold2", "plum4", "blueviolet", "firebrick4", "darkolivegreen4", "aquamarine4", "peachpuff3", "slateblue1", "midnightblue")) +
+        scale_color_manual(values=c("hotpink1", "lightsalmon2", "darkmagenta", "gold2", "plum4", "blueviolet", "firebrick4", "darkolivegreen4", "aquamarine4", "peachpuff3", "slateblue1", "midnightblue"))  
+  }
+}
+p
+
+dev.copy(tiff,"CMS_Cetuximab_CELLLINE.tiff",width=30, height=12, units="in",res=200) 
+dev.off() 
+
+
+
+------------------------Afatinib_Kras---------------------------------
+
+p<-ggpairs(
+  data1[,c(12, 27)],
+  mapping = ggplot2::aes(color = KRAS),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS-Afatinib"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("purple4", "lightsteelblue4")) +
+        scale_color_manual(values=c("purple4", "lightsteelblue4"))  
+  }
+}
+p
+
+dev.copy(tiff,"KRAS_Afatinib.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+
+
+
+------------------------KRAS-MSH3-Afatinib---------------------------------
+
+p<-ggpairs(
+  data1[,c(12, 47)],
+  mapping = ggplot2::aes(color = KRAS_MSH3),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS_MSH3_Afatinib"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("darkmagenta", "slateblue1", "midnightblue")) +
+        scale_color_manual(values=c("darkmagenta", "slateblue1", "midnightblue"))  
+  }
+}
+p
+
+dev.copy(tiff,"KRAS_MSH3_Afatinib.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+
+------------------------KRAS-Trametinib---------------------------------
+
+p<-ggpairs(
+  data1[,c(7, 27)],
+  mapping = ggplot2::aes(color = KRAS),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "KRAS_Trametinib"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("darkmagenta", "slateblue1", "midnightblue")) +
+        scale_color_manual(values=c("darkmagenta", "slateblue1", "midnightblue"))  
+  }
+}
+p
+
+dev.copy(tiff,"KRAS_MSH3_Afatinib.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+------------------------TreeShape-Drug---------------------------------
+
+p<-ggpairs(
+  data1[,c(45, 48)],
+  mapping = ggplot2::aes(color = TreeShape),
+  upper = list(continuous = wrap("density", alpha = 0.5), combo = "box"),
+  lower = list(continuous = wrap("points", alpha = 0.3), combo = wrap("dot", alpha = 0.4)),
+  diag = list(continuous = wrap("densityDiag")),
+  title = "TreeShape_Drug"
+)
+
+
+
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("darkmagenta", "slateblue1", "midnightblue")) +
+        scale_color_manual(values=c("darkmagenta", "slateblue1", "midnightblue"))  
+  }
+}
+p
+
+dev.copy(tiff,"TreeShape_Drug.tiff",width=8, height=8, units="in",res=200) 
+dev.off() 
+
+
+
+chart.Correlation(survivaldata, histogram=TRUE, pch=19)
+chart.Correlation(survivaldata2, histogram=TRUE, pch=19)
+
+chart.Correlation(survivaldata[,c(3:14)], histogram=TRUE, pch="+")
+chart.Correlation(survivaldata2[,c(7:17)], histogram=TRUE, pch="+")
+
+
+
+chart.Correlation(survivaldata[,c(5,8,9,10:17)], histogram=TRUE, pch="+")
+chart.Correlation(survivaldata2[,c(5,8,9,10:17)], histogram=TRUE, pch="+")
+
+chart.Correlation(survivaldata2[,c(10:14, 16, 17)], histogram=TRUE, pch="+")
+
+chart.Correlation(survivaldata2[,c(5,10:14)], histogram=TRUE, pch="+")
