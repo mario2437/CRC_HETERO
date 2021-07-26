@@ -6,8 +6,13 @@ data2<-data1[,2:28] # set dimensions
 data2 = as.matrix(data2) # set matrix format
 row.names(data2)<-data1$Gene_ID 
 
+### CMS prediction of RNA expression dataset
 res <- CMScaller(data2, RNAseq=TRUE, doPlot=TRUE, rowNames = "entrez") # plot created with this script
+
+### Camera Gene Set Analysis with CMS informative gene sets
 cam <- CMSgsa(emat=data2, class=res$prediction, RNAseq=TRUE)
+
+### limma differential gene expression analysis and visualization
 deg <- subDEG(emat=data2, class=res$prediction, doVoom=TRUE)
 
 write.table(res, "res_readcounts_of_RNAexpression.txt", sep="\t") # detailed information with CMS subtyping
