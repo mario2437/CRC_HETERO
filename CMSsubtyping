@@ -1,0 +1,15 @@
+library(CMScaller)
+
+data1<-read.table("readcounts_of_RNAexpression.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+
+data2<-data1[,2:28] # set dimensions
+data2 = as.matrix(data2) # set matrix format
+row.names(data2)<-data1$Gene_ID 
+
+res <- CMScaller(data2, RNAseq=TRUE, doPlot=TRUE, rowNames = "entrez") # plot created with this script
+cam <- CMSgsa(emat=data2, class=res$prediction, RNAseq=TRUE)
+deg <- subDEG(emat=data2, class=res$prediction, doVoom=TRUE)
+
+write.table(res, "res_readcounts_of_RNAexpression.txt", sep="\t") # detailed information with CMS subtyping
+dev.copy(tiff,"res_readcounts_of_RNAexpression.tiff",width=3, height=10, units="in",res=500) 
+dev.off() # make the plot 
