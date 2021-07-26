@@ -1,0 +1,32 @@
+library(ggpubr)
+heteromanova<-read.table("matrix_containing_numericv_values.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+heteromanovanum <- heteromanova[, 2:dimensions]
+
+# Basic plots
+ggscatter(heteromanova, x = "Drug", y = "DEPTHscore",
+          add = "reg.line",                                 # Add regression line
+          conf.int = TRUE,                                  # Add confidence interval
+          add.params = list(color = "blue",
+                            fill = "lightgray")
+          )+
+  stat_cor(method = "pearson", label.x = 1.5, label.y = 4.5)  # Add correlation coefficient
+
+# Add concentration ellipses
+# Change the ellipse type to 'convex'
+ggscatter(heteromanova, x = "Drug", y = "DEPTHscore",
+          color = "SAMPLESET", palette = "rainbow",
+          shape = "SAMPLESET",
+          ellipse = TRUE, ellipse.type = "convex")
+
+# Add point labels
+rownames(heteromanova) <- heteromanova$SAMPLE 
+heteromanova$SAMPLE <- rownames(heteromanova) 
+ggscatter(heteromanova, x = "Drug", y = "DEPTHscore",
+   color = "SAMPLESET", palette = "rainbow",
+   label = "SAMPLE", repel = FALSE)
+
+# Select some labels to show
+ggscatter(heteromanova, x = "Drug", y = "DEPTHscore",
+   color = "SAMPLESET", palette = "rainbow",
+   label = "SAMPLE", repel = TRUE,
+   label.select = c("names_of_subclones", "names_of_subclones", "names_of_subclones", "names_of_subclones", "names_of_subclones"))
