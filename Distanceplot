@@ -1,8 +1,8 @@
 rm(list=ls())
 setwd('C://Users/BECAUSEWECAN/Desktop')
 
-data1<-read.table("CRC_HETERO_DIST_TPM_SORTED_WOTumor.txt", header=T, sep="\t", na.strings = "NA", fill=T)
-data2<-data1[,2:82]
+data1<-read.table("RNA_expression_TPMvalue.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+data2<-data1[,2:dimesion]
 data2 = as.matrix(data2)
 row.names(data2)<-data1$Gene_ID
 head(data2)
@@ -41,33 +41,18 @@ ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
     size = 12, hjust = 1))+
  coord_fixed()
-dev.copy(tiff,"CRC_HTERO_DIST_CTOUT2.tiff",width=20, height=20, units="in",res=200) 
+dev.copy(tiff,"RNA_expression_TPMvalue.tiff",width=20, height=20, units="in",res=200) 
 dev.off() 
 
--------------------------------------------------------------------------------
-cormat2<-signif(cor(data2),2)
-head(cormat2)
-col<- colorRampPalette(c("blue", "white", "red"))(20)
-heatmap(cormat2, col=col, symm=TRUE)
-dev.copy(tiff,"CRC_HTERO_DIST_CTOUT.tiff",width=20, height=20, units="in",res=200) 
-dev.off() 
 
 -------------------------------------------------------------------------------
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("Biobase", "limma"))
 install.packages("gplots")
-
 library("gplots")
 library("RColorBrewer")
 colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 heatmap.2(cormat2, trace="none", col=colours)
-
 -------------------------------------------------------------------------------
 
-
-colnames(sampleDistMatrix) <- NULL   
-library( "gplots" )
-library( "RColorBrewer" )
-colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap.2( sampleDistMatrix, trace="none", col=colours)
 
