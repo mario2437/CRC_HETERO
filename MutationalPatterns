@@ -2,8 +2,6 @@ rm(list=ls())
 if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("MutationalPatterns")
 library("MutationalPatterns")
-setwd("F://TOTALVCF/CRCOrganoidVCFTotal/mutationalpattern/4139")
-
 library(BSgenome)
 head(available.genomes())
 ref_genome <- "BSgenome.Hsapiens.UCSC.hg19"
@@ -12,17 +10,14 @@ library(MutationalPatterns)
 
 ---------------------------------------------------------------------------------------------------
 
-vcf_dir <- c('F://TOTALVCF/CRCOrganoidVCFTotal/mutationalpattern/4139')
+vcf_dir <- c('directory_to_VCF_files')
 vcf_files <- list.files(vcf_dir, pattern = ".vcf", full.names = TRUE)
-
 vcf_files2 <- list.files(pattern = ".vcf", full.names = TRUE)
 write.table(vcf_files2, "totallist.txt", sep="\t")
-data1<-read.table("totallist.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+data1<-read.table("total_list.txt", header=T, sep="\t", na.strings = "NA", fill=T)
 v.data1<-as.vector(t(data1))
 length(v.data1)
-
 sample_names <- v.data1
-
 vcfs <- read_vcfs_as_granges(vcf_files, sample_names, ref_genome)
 summary(vcfs)
 tissue <- v.data1
@@ -47,7 +42,7 @@ p3 <- plot_spectrum(type_occurrences, CT = TRUE, legend = FALSE)
 library("gridExtra")
 grid.arrange(p1, p2, p3, ncol=3, widths=c(3,3,1.75))
 
-dev.copy(tiff,"4849mutsig.tiff",width=16, height=8, units="in",res=200) 
+dev.copy(tiff,"mutsig.tiff",width=16, height=8, units="in",res=200) 
 dev.off() 
 
 
@@ -56,7 +51,7 @@ palette <- c("pink", "orange", "blue", "lightblue", "green", "red", "purple")
 p5 <- plot_spectrum(type_occurrences, CT=TRUE, legend=TRUE, colors=palette)
 grid.arrange(p4, p5, ncol=2, widths=c(4,2.3))
 
-dev.copy(tiff,"4849mutsig2.tiff",width=16, height=8, units="in",res=200) 
+dev.copy(tiff,"mutsig2.tiff",width=16, height=8, units="in",res=200) 
 dev.off() 
 
 mut_mat <- mut_matrix(vcf_list = vcfs, ref_genome = ref_genome)
@@ -64,7 +59,7 @@ head(mut_mat)
 write.table(mut_mat, "mut_mat_4139.txt", sep="\t")
 plot_96_profile(mut_mat)
 
-dev.copy(tiff,"4849mutmatrix.tiff",width=10, height=11, units="in",res=200) 
+dev.copy(tiff,"mutmatrix.tiff",width=10, height=11, units="in",res=200) 
 dev.off() 
 
 
@@ -85,7 +80,6 @@ pc1 <- plot_contribution(nmf_res$contribution, nmf_res$signature, mode = "relati
 pc2 <- plot_contribution(nmf_res$contribution, nmf_res$signature, mode = "absolute")
 grid.arrange(pc1, pc2)
 plot_contribution(nmf_res$contribution, nmf_res$signature, mode = "absolute", coord_flip = TRUE)
-
 
 sp_url <- paste("https://cancer.sanger.ac.uk/cancergenome/assets/", "signatures_probabilities.txt", sep = "")
 cancer_signatures = read.table(sp_url, sep = "\t", header = TRUE)
