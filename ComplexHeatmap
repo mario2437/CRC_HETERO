@@ -2,37 +2,26 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("ComplexHeatmap")
 biocLite("colorspace")
 library(ComplexHeatmap)
-setwd("C://Users/BECAUSEWECAN/Desktop")
 
-data1<-read.table("CRCFINAL_V3.txt", header=T, sep="\t", na.strings = "NA", fill=T)
+# read the drug response data
+data1<-read.table("AUCs_with_names_of_Drugs.txt", header=T, sep="\t", na.strings = "NA", fill=T)
 row.names(data1)<-data1$SAMPLE
-r.data1<-data1[,2:57]
+r.data1<-data1[,2:the dimensions]
 r.data1_matrix<-data.matrix(r.data1)
 
-data2<-read.table("crcfinalcolorder2.txt", header=T, sep="\t", na.strings = "NA", fill=T)
-data3<-read.table("crcfinalroworder.txt", header=T, sep="\t", na.strings = "NA", fill=T)
-
+# set the order of raw and column if needed
+data2<-read.table("crc_final_colorder.txt", header=T, sep="\t", na.strings = "NA", fill=T)
 v.data2<-as.vector(t(data2))
+
+data3<-read.table("crc_final_roworder.txt", header=T, sep="\t", na.strings = "NA", fill=T)
 v.data3<-as.vector(t(data3))
 
-Heatmap(r.data1_matrix, name = "AUC", column_order = v.data2, row_order = v.data3)
+# draw heatmap defaulting clustering 
+Heatmap(r.data1_matrix, name = "AUC")
 
-cluster_columns = FALSE, 
+# draw heatmap k-means clustering 
+Heatmap(r.data1_matrix, name = "AUC", row_km = 2, row_km_repeats = 100, column_km = 3, column_km_repeats = 100)
 
-
-dev.copy(tiff,"DRUGTOTAL2dvs3dv2.tiff",width=15.9, height=10, units="in",res=200) 
-dev.off() 
-
-Heatmap(r.data1_matrix, name = "AUC", row_km = 2, row_km_repeats = 100, column_km = 2, column_km_repeats = 100)
-
-Heatmap(r.data1_matrix)
-
+# make the plot
 dev.copy(tiff,"CRCHETERODRUGALL_HEAT_Kmeans.tiff",width=22.7, height=11, units="in",res=200) 
 dev.off() 
-
-data2<-read.table("CRCDRUGORDER2.txt", header=T, sep="\t", na.strings = "NA", fill=T)
-v.data2<-as.vector(t(data2))
-Heatmap(r.data1_matrix, cluster_row = TRUE, cluster_columns = FALSE, column_order = c('SNU4351S2TO', 'SNU4351S4TO', 'SNU4351S3TO'))
-
-
-
