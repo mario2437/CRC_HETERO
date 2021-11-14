@@ -1,0 +1,83 @@
+# Estimate the probability of mixing of lines in RNA-seq using CeL-ID (BMC Genomics. 2019 Feb 4;20(Suppl 1):81.). 
+
+# Assign function
+Cell_Identification <- function( cell_freq, cell_dp, query_freq, query_dp ) {
+
+  freq_merged <- merge(cell_freq, query_freq, by = "row.names", all = FALSE )
+  dp_merged   <- merge(cell_dp, query_dp, by = "row.names", all = FALSE )
+  
+  rownames(freq_merged) <- freq_merged$Row.names;
+  freq_merged = freq_merged[,-1]
+  rownames(dp_merged) <- dp_merged$Row.names;
+  dp_merged = dp_merged[,-1]
+  numRows = nrow( freq_merged )
+  numSamples = ncol( freq_merged )
+  cat( paste( "Total of ", numRows, " variants selected" ), "\n" )
+
+  # initialization (note: last sample are query sample)
+  rho <- rep( 0, numSamples-1 )
+  jcount <- rep( 0, numSamples-1 )
+  snpCounts <- rep(0, numSamples-1 )
+  dpThr <- 10
+  
+  tmp1 = freq_merged > 0;
+  tmp2 = dp_merged >= dpThr;
+
+  for( i in 1:(numSamples-1) ) {
+    snpCounts[i] = sum( tmp1[,i] & tmp2[,i] )
+    idx = which( (tmp1[,i] | tmp1[,numSamples] ) & (tmp2[,i] & tmp2[,numSamples]) )
+    jcount[i] = length(idx)
+    if( jcount[i] <= 1 ) {
+      rho[i] = 0;
+    } else {
+      rho[i] = cor( freq_merged[idx,i], freq_merged[idx, numSamples] )
+    }
+  }
+  
+  # output each cell-line and it best and second to best cell-line name and
+  # correlation coefficient/number of matching mutations.
+  sdx = sort( rho, decreasing = TRUE, index.return = TRUE )$ix
+  
+  # Within cell RNA-seq samples, rho distribution is (mu, sigma, p0.001) = 0.470, 0.047, 0.61
+  # see T. Mohammad, et al, BMC Genomics, 2019
+  txtStr = c("1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th")
+  cell_names = colnames(freq_merged)
+  colnames(freq_merged) <- c( cell_names[-numSamples], "Query sample")
+  for( k in 1:10 ) {
+    p = pnorm( rho[sdx[k]], mean = 0.470, sd = 0.047, lower.tail = FALSE );
+    if( p > 0.001 ) {
+      cat( paste(txtStr[k], " match cell-line is ", cell_names[sdx[k]], 
+                            "with rho = ", sprintf( "%.3f", rho[sdx[k]]), 
+                            " p = ",  sprintf( "%.3f", p) ) )
+    } else {
+      cat( paste(txtStr[k], " match cell-line is ", cell_names[sdx[k]], 
+                            "with rho = ", sprintf( "%.3f", rho[sdx[k]]), 
+                            " p = ",  sprintf( "%.3e", p) ) )
+    }
+    if( rho[sdx[k]] > 0.61 && k == 1 ) {
+      cat( "   <<< matched cell-line (> L0.001)" )
+    }
+    cat( "\n")
+  }
+  
+  m = freq_merged[,c(numSamples, sdx[1:10], sdx[(numSamples-10):(numSamples-1)])]
+  for( i in 1:10 ) {
+    for( j in 1:10 ) {
+      if( m[i,j] == 0 ) { m[i, j] = NA}
+    }
+  }
+  mx = cor( m, use = "pairwise.complete.obs" )
+  
+  # return correlation/sort order index as list.
+  return( list( rho, sdx, mx ) )
+}
+
+# Apply assigned function to the data matrix 
+setwd("your_CeL-ID-master_directory")
+source("Cel-ID_functions.R")
+cell_dp <- read.delim("file_containing_dp_info_of_entire_lines.txt", sep  = "\t", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
+cell_freq <- read.delim("file_containing_freq_info_of_entire_lines.txt", sep  = "\t", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
+query_dp <- read.delim("file_containting_dp_info_of_specific_line.txt", sep  = "\t", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
+query_freq <- read.delim("file_containting_freq_info_of_specific_line.txt", sep  = "\t", header = TRUE, row.names = 1, stringsAsFactors = FALSE)
+rt = Cell_Identification(cell_freq, cell_dp, query_freq, query_dp)
+write.table(rt[[1]], "name_of_line_query_dp_rho.txt", sep  = "\t", row.names=F)
